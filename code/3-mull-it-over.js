@@ -1,5 +1,5 @@
-function sumAllValidMuls(instructions){
-    const validInstructions = findValidMuls(instructions)
+function sumAllValidMuls(instructions, useConditionals=false){
+    const validInstructions = findValidMuls(instructions, useConditionals)
     
     const sumOfMuls = validInstructions.map((instruction) => {
         return eval(instruction)
@@ -10,38 +10,50 @@ function sumAllValidMuls(instructions){
     return sumOfMuls
 }
 
-function findValidMuls(instructions){
+function findValidMuls(instructions, useConditionals){
     const validInstructions = []
+    let isDoActive = true
     for(let i=0; i<instructions.length; i=i+1){
-        if(instructions[i] === "m" && instructions[i+1] === "u" & instructions[i+2] === "l"){
-            let commaFound = false
-            for(let j=i+3; j<instructions.length; j=j+1){
-                if(j === i+3){
-                    if(instructions[j] !== "("){
-                        i = j
-                        break
-                    }
-                } else if(isNaN(parseInt(instructions[j]))){
-                    if(instructions[j] === ")" && commaFound === true){
-                        validInstructions.push(instructions.slice(i,j+1))
-                        i = j
-                        break
-                    }
-                    if(instructions[j] === "," && commaFound === false){
-                        commaFound = true
-                    } else {
-                        i = j
-                        break
-                    }
+        if(useConditionals === true && instructions.slice(i,i+7) === "don't()"){
+            isDoActive = false
+        } else if(useConditionals === true && instructions.slice(i,i+4) === "do()"){
+            isDoActive = true
+        }
+        if(useConditionals === false || isDoActive === true){
+            if(instructions.slice(i,i+3) === "mul"){
+                const {endOfMul, isMulValid} = findEndOfMul(instructions, i)
+                if(isMulValid === true){
+                    validInstructions.push(instructions.slice(i,endOfMul+1))
                 }
+                i = endOfMul
             }
         }
     }
     return validInstructions
 }
 
+function findEndOfMul(instructions, index){
+    let commaFound = false
+    for(let i=index+3; i<instructions.length; i=i+1){
+        if(i === index+3){
+            if(instructions[i] !== "("){
+                return {endOfMul: i, isMulValid: false}
+            }
+        } else if(isNaN(parseInt(instructions[i]))){
+            if(instructions[i] === ")" && commaFound === true){
+                return {endOfMul: i, isMulValid: true}
+            }
+            if(instructions[i] === "," && commaFound === false){
+                commaFound = true
+            } else {
+                return {endOfMul: i, isMulValid: false}
+            }
+        }
+    }
+}
+
 function mul(a,b){
     return a*b
 }
 
-module.exports = {sumAllValidMuls}
+module.exports = sumAllValidMuls
