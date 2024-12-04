@@ -3,17 +3,40 @@ function findXmasInWordsearch(wordsearch){
     wordsearch.forEach((row, currentRowIndex, allRows) => {
         for(let rowLetterIndex=0; rowLetterIndex<row.length; rowLetterIndex=rowLetterIndex+1){
             //check rows of wordsearch
-            if(containsXmas(row.slice(rowLetterIndex,rowLetterIndex+4))){
+            if(isWordsearchWordValid(row.slice(rowLetterIndex,rowLetterIndex+4), "XMAS")){
                 totalXmas = totalXmas + 1
-            } 
+            }
+
             //check columns of wordsearch
             let currentColumn = ""
-            for(let i=currentRowIndex; i<currentRowIndex+4; i=i+1){
-                if(currentRowIndex <= allRows.length - 4 && currentRowIndex >= 0){
-                    currentColumn = currentColumn + (allRows[i][rowLetterIndex] !== undefined ? allRows[i][rowLetterIndex] : "")
+            if(currentRowIndex <= allRows.length - 4 && currentRowIndex >= 0){
+                for(let i=0; i<4; i=i+1){
+                    currentColumn = currentColumn + allRows[currentRowIndex+i][rowLetterIndex]
                 }
             }
-            if(containsXmas(currentColumn)){
+            if(isWordsearchWordValid(currentColumn, "XMAS")){
+                totalXmas = totalXmas + 1
+            }
+
+            //check diagonally going from left to right
+            let currentRightDiagonal = ""
+            if(rowLetterIndex <= row.length - 4 && currentRowIndex <= allRows.length - 4 && rowLetterIndex >= 0){
+                for(let i=0; i<4; i=i+1){
+                    currentRightDiagonal = currentRightDiagonal + allRows[currentRowIndex+i][rowLetterIndex+i]
+                }
+            }
+            if(isWordsearchWordValid(currentRightDiagonal, "XMAS")){
+                totalXmas = totalXmas + 1
+            }
+
+            //check diagonally going from right to left
+            let currentLeftDiagonal = ""
+            if(rowLetterIndex >= 3 && currentRowIndex <= allRows.length - 4 && rowLetterIndex >= 0){
+                for(let i=0; i<4; i=i+1){
+                    currentLeftDiagonal = currentLeftDiagonal + allRows[currentRowIndex+i][rowLetterIndex-i]
+                }
+            }
+            if(isWordsearchWordValid(currentLeftDiagonal, "XMAS")){
                 totalXmas = totalXmas + 1
             }
         }
@@ -21,11 +44,29 @@ function findXmasInWordsearch(wordsearch){
     return totalXmas
 }
 
-function containsXmas(string){
-    if(string === "XMAS" || [...string].reverse().join("") === "XMAS"){
+function findX_Mas(wordsearch){
+    let totalX_Mas = 0
+    for(let currentRowIndex=0; currentRowIndex<=wordsearch.length-3; currentRowIndex=currentRowIndex+1){
+        for(let rowLetterIndex=0; rowLetterIndex<=wordsearch[currentRowIndex].length-2; rowLetterIndex=rowLetterIndex+1){
+            let currentLeftDiagonal = ""
+            let currentRightDiagonal = ""
+            for(let i=0; i<=2; i=i+1){
+                currentLeftDiagonal = currentLeftDiagonal + wordsearch[currentRowIndex+i][rowLetterIndex+i]
+                currentRightDiagonal = currentRightDiagonal + wordsearch[currentRowIndex+i][2+rowLetterIndex-i]
+            }
+            if(isWordsearchWordValid(currentLeftDiagonal, "MAS") && isWordsearchWordValid(currentRightDiagonal, "MAS")){
+                totalX_Mas = totalX_Mas + 1
+            }
+        }
+    }
+        return totalX_Mas
+}
+
+function isWordsearchWordValid(testString, targetString){
+    if(testString === targetString || [...testString].reverse().join("") === targetString){
         return true
     }
     return false
 }
 
-module.exports = findXmasInWordsearch
+module.exports = {findXmasInWordsearch, findX_Mas}
