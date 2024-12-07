@@ -1,4 +1,5 @@
 const fs = require("fs/promises")
+const getTotalOfValidMiddlePages = require("../code/5-print-queue.js")
 
 fs.readFile(`${__dirname}/../data/5-print-queue-data.txt`, "utf-8").then((response) => {
     const data = response.split("\n")
@@ -12,4 +13,5 @@ fs.readFile(`${__dirname}/../data/5-print-queue-data.txt`, "utf-8").then((respon
             return parseInt(pageNumber)
         })
     })
+    console.log(getTotalOfValidMiddlePages(orderingRules, pageNumbers))
 })
